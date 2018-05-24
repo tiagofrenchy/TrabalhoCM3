@@ -3,7 +3,6 @@ library(dplyr)
 library(readxl)
 library(car)
 library(plyr)
-library(dplyr)
 library(stringr)
 
 ### Opens the base file and creates a properly ordered database
@@ -230,3 +229,41 @@ for (i in c("cfunc0", "cfunc16", "aspfis0", "aspfis16", "t6min0", "t6min16")){
 }
 
 write.csv(summario, sprintf("summario.csv"), row.names = TRUE)
+
+########## Trabalho 2 - DOR
+
+library(stats)
+library(MASS)
+library(matrixcalc)
+library(Skillings.Mack)
+library(tidyr)
+library(reshape2)
+
+
+fibrodor <- select(fibro, "Paciente", "grupo", "eav0", "eav8", "eav16", "tempdo", "dor0", "dor8", "dor16")
+fibrodor$grupo <- gsub('caminhada', 1, fibrodor$grupo)
+fibrodor$grupo <- gsub('rml', 2, fibrodor$grupo)
+fibrodor$grupo <- gsub('controle', 3, fibrodor$grupo)
+View(fibrodor)
+
+fibrodor2 <- melt(fibrodor, c("eav0","eav8","eav16"), id.vars = c("Paciente", "grupo"), variable.name = "temp")
+View(fibrodor2)
+
+qa <- list(descr = "G1 x G2 em T0",       teste = "Wilcoxon-Mann-Whitney Test", p = wilcox.test(fibrodor$eav0[which(fibrodor$grupo == 1 | fibrodor$grupo == 2)] ~ fibrodor$grupo[which(fibrodor$grupo == 1 | fibrodor$grupo == 2)])$p.value)
+qb <- list(descr = "G1 x G2 em T16",      teste = "Wilcoxon-Mann-Whitney Test", p = wilcox.test(fibrodor$eav16[which(fibrodor$grupo == 1 | fibrodor$grupo == 2)] ~ fibrodor$grupo[which(fibrodor$grupo == 1 | fibrodor$grupo == 2)])$p.value)
+qc <- list(descr = "G1 x G2 x G3 em T0",  teste = "Kruskal-Wallis Test",        p = kruskal.test(fibrodor$eav0 ~ as.factor(fibrodor$grupo))$p.value)
+qd <- list(descr = "G1 x G2 x G3 em T16", teste = "Kruskal-Wallis Test",        p = kruskal.test(fibrodor$eav8 ~ as.factor(fibrodor$grupo))$p.value)
+qe <- list(descr = "T0 x T16 em G1",      teste = "Wilcoxon Signed-Rank Test",  p = wilcox.test(fibrodor$eav0[which(fibrodor$grupo == 1)], fibrodor$eav16[which(fibrodor$grupo == 1)], paired = TRUE)$p.value)
+qf <- list(descr = "T0 x T16 em G2",      teste = "Wilcoxon Signed-Rank Test",  p = wilcox.test(fibrodor$eav0[which(fibrodor$grupo == 2)], fibrodor$eav16[which(fibrodor$grupo == 2)], paired = TRUE)$p.value)
+qg <- list(descr = "T0 x T16 em G3",      teste = "Wilcoxon Signed-Rank Test",  p = wilcox.test(fibrodor$eav0[which(fibrodor$grupo == 3)], fibrodor$eav16[which(fibrodor$grupo == 3)], paired = TRUE)$p.value)
+#TODO: trocar por skillings-mack
+qh <- list(descr = "T0 x T8 x T16 em G1", teste = "Friedman Test",              p = friedman.test(fibrodor2$value[which(fibrodor$grupo == 1)], as.factor(fibrodor2$temp[which(fibrodor$grupo == 1)]), as.factor(fibrodor2$Paciente[which(fibrodor$grupo == 1)]))$p.value)
+qi <- list(descr = "T0 x T8 x T16 em G2", teste = "Friedman Test",              p = friedman.test(fibrodor2$value[which(fibrodor$grupo == 2)], as.factor(fibrodor2$temp[which(fibrodor$grupo == 2)]), as.factor(fibrodor2$Paciente[which(fibrodor$grupo == 2)]))$p.value)
+qj <- list(descr = "T0 x T8 x T16 em G3", teste = "Friedman Test",              p = friedman.test(fibrodor2$value[which(fibrodor$grupo == 3)], as.factor(fibrodor2$temp[which(fibrodor$grupo == 3)]), as.factor(fibrodor2$Paciente[which(fibrodor$grupo == 3)]))$p.value)
+
+dor <- setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("descricao", "teste utilizado", "valor de p"))
+dor$descricao <- a$descr
+View(dor)
+
+
+
