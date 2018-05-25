@@ -1,0 +1,11 @@
+"","descr","teste","p"
+"1","G1 x G2 em T0","Wilcoxon-Mann-Whitney Test",0.919540894640706
+"2","G1 x G2 em T16","Wilcoxon-Mann-Whitney Test",0.540103770861429
+"3","G1 x G2 x G3 em T0","Kruskal-Wallis Test",0.490227913559167
+"4","G1 x G2 x G3 em T16","Kruskal-Wallis Test",0.0778082498214969
+"5","T0 x T16 em G1","Wilcoxon Signed-Rank Test",0.0000451334297356072
+"6","T0 x T16 em G2","Wilcoxon Signed-Rank Test",0.00000469104904213905
+"7","T0 x T16 em G3","Wilcoxon Signed-Rank Test",0.000216016004819861
+"8","T0 x T8 x T16 em G1","Friedman Test",0.149569
+"9","T0 x T8 x T16 em G2","Friedman Test",0.97531
+"10","T0 x T8 x T16 em G3","Friedman Test",0.927743
