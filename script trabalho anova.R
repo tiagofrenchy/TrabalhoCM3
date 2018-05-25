@@ -22,7 +22,6 @@ fibro$menop   <- gsub('0', 'nao', fibro$menop)
 fibro$imccat <- cut(fibro$imc, breaks = c(-Inf, 24.9, 30, Inf),
                     labels = c("normal","sobrepeso", "obesidade"))
 fibro <- subset(fibro, select = c(1:4, 38, 5:37))
-
 # View(fibro)
 
 ### Sets the p-Value of interest that we will use to test with logical arguments
