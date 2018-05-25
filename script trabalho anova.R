@@ -239,12 +239,14 @@ library(Skillings.Mack)
 library(tidyr)
 library(reshape2)
 
+# Creates dataframe by selecting the information needed for the analysis
 fibrodor <- select(fibro, "Paciente", "grupo", "eav0", "eav8", "eav16", "tempdo", "dor0", "dor8", "dor16")
 fibrodor$grupo <- gsub('caminhada', 1, fibrodor$grupo)
 fibrodor$grupo <- gsub('rml', 2, fibrodor$grupo)
 fibrodor$grupo <- gsub('controle', 3, fibrodor$grupo)
 #View(fibrodor)
 
+# Creates a second dataframe that enables analysis through repeated measure ANOVA alternatives
 fibrodor2 <- melt(fibrodor, c("eav0","eav8","eav16"), id.vars = c("Paciente", "grupo"), variable.name = "temp")
 fibrodor2$value <- factor(fibrodor2$value)
 fibrodor2$temp <- factor(fibrodor2$temp)
@@ -252,22 +254,27 @@ fibrodor2$Paciente <- factor(fibrodor2$Paciente)
 fibrodor2 <- fibrodor2[order( fibrodor2[,2], fibrodor2[,1] ),]
 #View(fibrodor2)
 
+# Abolishes scientific notation
 options(scipen = 999)
 
+# Creates the dataframe to record the final results
 dor <- setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("descricao", "teste utilizado", "valor de p"))
 dor$descricao <- a$descr
 #View(dor)
 
+# Executes the Wilcoxon-Mann-Whitney Test and records data in df
 qa <- list(descr = "G1 x G2 em T0",       teste = "Wilcoxon-Mann-Whitney Test", p = wilcox.test(fibrodor$eav0[which(fibrodor$grupo == 1 | fibrodor$grupo == 2)] ~ fibrodor$grupo[which(fibrodor$grupo == 1 | fibrodor$grupo == 2)])$p.value)
 dor <- rbind(dor, as.data.frame(qa))
 qb <- list(descr = "G1 x G2 em T16",      teste = "Wilcoxon-Mann-Whitney Test", p = wilcox.test(fibrodor$eav16[which(fibrodor$grupo == 1 | fibrodor$grupo == 2)] ~ fibrodor$grupo[which(fibrodor$grupo == 1 | fibrodor$grupo == 2)])$p.value)
 dor <- rbind(dor, as.data.frame(qb))
 
+# Executes the Kruskal-Wallis Test and records data in df
 qc <- list(descr = "G1 x G2 x G3 em T0",  teste = "Kruskal-Wallis Test",        p = kruskal.test(fibrodor$eav0 ~ as.factor(fibrodor$grupo))$p.value)
 dor <- rbind(dor, as.data.frame(qc))
 qd <- list(descr = "G1 x G2 x G3 em T16", teste = "Kruskal-Wallis Test",        p = kruskal.test(fibrodor$eav8 ~ as.factor(fibrodor$grupo))$p.value)
 dor <- rbind(dor, as.data.frame(qd))
 
+# Executes the Wilcoxon Signed-Rank Test and records data in df
 qe <- list(descr = "T0 x T16 em G1",      teste = "Wilcoxon Signed-Rank Test",  p = wilcox.test(fibrodor$eav0[which(fibrodor$grupo == 1)], fibrodor$eav16[which(fibrodor$grupo == 1)], paired = TRUE)$p.value)
 dor <- rbind(dor, as.data.frame(qe))
 qf <- list(descr = "T0 x T16 em G2",      teste = "Wilcoxon Signed-Rank Test",  p = wilcox.test(fibrodor$eav0[which(fibrodor$grupo == 2)], fibrodor$eav16[which(fibrodor$grupo == 2)], paired = TRUE)$p.value)
@@ -275,11 +282,13 @@ dor <- rbind(dor, as.data.frame(qf))
 qg <- list(descr = "T0 x T16 em G3",      teste = "Wilcoxon Signed-Rank Test",  p = wilcox.test(fibrodor$eav0[which(fibrodor$grupo == 3)], fibrodor$eav16[which(fibrodor$grupo == 3)], paired = TRUE)$p.value)
 dor <- rbind(dor, as.data.frame(qg))
 
-qh <- list(descr = "T0 x T8 x T16 em G1", teste = "Friedman Test",              p = as.double(strsplit(capture.output(Ski.Mack(fibrodor2$value[which(fibrodor$grupo == 1)], fibrodor2$temp[which(fibrodor$grupo == 1)], fibrodor2$Paciente[which(fibrodor$grupo == 1)]))[2], ", p-value = ")[[1]][2]))
+# Executes the Skillings-Mack Test and records data in df
+qh <- list(descr = "T0 x T8 x T16 em G1", teste = "Skillings-Mack Test",              p = as.double(strsplit(capture.output(Ski.Mack(fibrodor2$value[which(fibrodor$grupo == 1)], fibrodor2$temp[which(fibrodor$grupo == 1)], fibrodor2$Paciente[which(fibrodor$grupo == 1)]))[2], ", p-value = ")[[1]][2]))
 dor <- rbind(dor, as.data.frame(qh))
-qi <- list(descr = "T0 x T8 x T16 em G2", teste = "Friedman Test",              p = as.double(strsplit(capture.output(Ski.Mack(fibrodor2$value[which(fibrodor$grupo == 2)], fibrodor2$temp[which(fibrodor$grupo == 2)], fibrodor2$Paciente[which(fibrodor$grupo == 2)]))[2], ", p-value = ")[[1]][2]))
+qi <- list(descr = "T0 x T8 x T16 em G2", teste = "Skillings-Mack Test",              p = as.double(strsplit(capture.output(Ski.Mack(fibrodor2$value[which(fibrodor$grupo == 2)], fibrodor2$temp[which(fibrodor$grupo == 2)], fibrodor2$Paciente[which(fibrodor$grupo == 2)]))[2], ", p-value = ")[[1]][2]))
 dor <- rbind(dor, as.data.frame(qi))
-qj <- list(descr = "T0 x T8 x T16 em G3", teste = "Friedman Test",              p = as.double(strsplit(capture.output(Ski.Mack(fibrodor2$value[which(fibrodor$grupo == 3)], fibrodor2$temp[which(fibrodor$grupo == 3)], fibrodor2$Paciente[which(fibrodor$grupo == 3)]))[2], ", p-value = ")[[1]][2]))
+qj <- list(descr = "T0 x T8 x T16 em G3", teste = "Skillings-Mack Test",              p = as.double(strsplit(capture.output(Ski.Mack(fibrodor2$value[which(fibrodor$grupo == 3)], fibrodor2$temp[which(fibrodor$grupo == 3)], fibrodor2$Paciente[which(fibrodor$grupo == 3)]))[2], ", p-value = ")[[1]][2]))
 dor <- rbind(dor, as.data.frame(qj))
 
+# Saves the final results
 write.csv(dor, file = "respostas trabalho 2.csv")
